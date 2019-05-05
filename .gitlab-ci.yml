@@ -1,0 +1,57 @@
+stages:
+  - build
+  - test
+before_script:
+  - ls -alh "/var/"
+variables:
+  DATABASE_URL: "postgres://postgres@postgres/my_database"
+.job1:
+  stage: test  
+  before_script:
+    - ls -alh "/etc/"
+  variables:
+    GIT_URL: "http://192.168.17.143/root/ocp/edit/master/.gitlab-ci.yml"
+    name: "dev"
+  script:
+   - pwd
+   - whoami
+   - echo ${CI_COMMIT_REF_NAME}_$(date +%F)
+   - echo ${GIT_URL}
+   - echo ${DATABASE_URL}
+   - echo ${name}
+  after_script:
+   - echo ${SHELL}
+  only:
+   - master
+  tags:
+   - web
+job2:
+  stage: build
+  script:
+   - /usr/local/apache-maven-3.6.0/bin/mvn clean package 
+   - echo "succed ok"
+   - echo -e "succed\nok"
+   - pwd
+   - echo ${CI_COMMIT_REF_NAME}
+  only:
+   - xie
+  tags:
+   - web
+.public:  &deploy_template
+  stage: build
+  script:
+   - echo "succed ok"
+  only:
+   - master
+job3:
+  <<:  *deploy_template
+  variables:
+    HOST_IP: "192.168.17.143"
+  after_script:
+   - echo ${HOST_IP}
+  tags:
+   - web
+
+    
+  
+  
